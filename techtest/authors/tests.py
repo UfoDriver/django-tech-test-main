@@ -51,6 +51,23 @@ class AuthorListViewTestCase(TestCase):
             response.json(),
         )
 
+    def test_creates_new_author_names_required(self):
+        payload = {
+            "first_name": "",
+            "last_name": "",
+        }
+        response = self.client.post(
+            self.url, data=json.dumps(payload), content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertDictEqual(
+            {
+                "first_name": ['Length must be between 1 and 255.'],
+                "last_name": ['Length must be between 1 and 255.'],
+            },
+            response.json(),
+        )
+
 
 class AuthorViewTestCase(TestCase):
     def setUp(self):
@@ -86,6 +103,23 @@ class AuthorViewTestCase(TestCase):
                 "id": author.id,
                 "first_name": "Homer (Modified)",
                 "last_name": "Simpson (Modified again)",
+            },
+            response.json(),
+        )
+
+    def test_update_author_names_required(self):
+        payload = {
+            "first_name": "",
+            "last_name": "",
+        }
+        response = self.client.put(
+            self.url, data=json.dumps(payload), content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertDictEqual(
+            {
+                "first_name": ['Length must be between 1 and 255.'],
+                "last_name": ['Length must be between 1 and 255.'],
             },
             response.json(),
         )
