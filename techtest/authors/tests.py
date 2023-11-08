@@ -51,19 +51,35 @@ class AuthorListViewTestCase(TestCase):
             response.json(),
         )
 
-    def test_creates_new_author_names_required(self):
+    def test_create_new_author(self):
         payload = {
-            "first_name": "",
-            "last_name": "",
+            "first_name": "Bart",
+            "last_name": "Simpson",
         }
         response = self.client.post(
             self.url, data=json.dumps(payload), content_type="application/json"
         )
+        author = Author.objects.last()
+        self.assertEqual(response.status_code, 201)
+        self.assertIsNotNone(author)
+        self.assertDictEqual(
+            {
+                "id": author.id,
+                "first_name": "Bart",
+                "last_name": "Simpson",
+            },
+            response.json(),
+        )
+
+    def test_creates_new_author_garbage_json(self):
+
+        response = self.client.post(
+            self.url, "Not valid json", content_type="application/json"
+        )
         self.assertEqual(response.status_code, 400)
         self.assertDictEqual(
             {
-                "first_name": ['Length must be between 1 and 255.'],
-                "last_name": ['Length must be between 1 and 255.'],
+                "error": "Unprocessable JSON",
             },
             response.json(),
         )

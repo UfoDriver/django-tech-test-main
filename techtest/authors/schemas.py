@@ -7,7 +7,7 @@ from techtest.authors.models import Author
 
 
 class AuthorSchema(Schema):
-    class Meta(object):
+    class Meta:
         model = Author
 
     id = fields.Integer()
@@ -16,7 +16,7 @@ class AuthorSchema(Schema):
 
     @post_load
     def update_or_create(self, data, *args, **kwargs):
-        article, _ = Author.objects.update_or_create(
+        author, _ = Author.objects.update_or_create(
             id=data.pop("id", None), defaults=data
         )
-        return article
+        return author

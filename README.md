@@ -12,7 +12,7 @@
 
 - To run the application in a virtual Python environment, follow these instructions. This example will create a virtual Python environment for 3.9.6
 - Check you have the pyenv version you need: `pyenv versions`
-- You should see 3.9.6
+- You should see 3.9.6s
 - If you do not have the correct version of Python, install it like this: `pyenv install 3.9.6`
 - On command line do this: `~/.pyenv/versions/3.9.6/bin/python -m venv env`
 - This creates a folder called env. Then do this to activate the virtual environment: `source env/bin/activate`
@@ -40,3 +40,29 @@
     - Delete a single entity
 - The app should be robust and you should make sure that everything works as specified.
 - Add unit tests for any code written to implement the tasks using a testing framework of your choice.
+
+### Suggestions
+
+- Poetry seems like phasing out plain virtualenv, consider using it.
+- Pytets is fast and it's fixtures are amazing. Even using standard django tests can be much
+pleasant with custom client (e.g. with put_json/post_json methods).
+- There should be a way not to repeat model fields in marshmellow schema. At least for "usual"
+fields. If not, that should be possible to implement.
+- With time, urls for each django application should me moved to it's own module.
+- Views should use generic views or application specific generic views (e.g. `View.dispatch` is very
+generic and `AuthorView.dispatch` handles one more error case.
+- `ObjectClass.objects.last()` in tests is not stable (at least for postgresql). For that models
+should have ordering.
+- `class Meta(object)` - python2 atavisms
+- I'd change `super(AuthorView, self).dispatch(...)` to `super().dispatch()`
+- Some tests test too much (e.g. article update test)
+- Creating objects in schema seems very strange. Schemas should be used for validation, object
+handling responsibility of views (actually it's even better to move it to business logic level).
+It's possible to overwrite existing object when creating object of that type when ID of that
+existing object is supplied (fixed in AuthorsView).
+
+### Questions
+
+- Is the ability to create new authors with article needed?
+- Decision on REST related/nested object format needed (e.g. HATEOAS, https://learn.microsoft.com/en-us/azure/architecture/best-practices/api-design#use-hateoas-to-enable-navigation-to-related-resources)
+- Should author's resource return list of authors articles? If yes, should that field be updatable?

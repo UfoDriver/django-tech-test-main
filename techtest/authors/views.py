@@ -14,9 +14,12 @@ class AuthorsListView(View):
 
     def post(self, request, *args, **kwargs):
         try:
-            author = AuthorSchema().load(json.loads(request.body))
+            author = AuthorSchema(exclude=["id"]).load(json.loads(request.body))
         except ValidationError as e:
             return json_response(e.messages, 400)
+        except json.JSONDecodeError:
+            return json_response({"error": "Unprocessable JSON"}, 400)
+
         return json_response(AuthorSchema().dump(author), 201)
 
 
@@ -26,8 +29,13 @@ class AuthorView(View):
             self.author = Author.objects.get(pk=author_id)
         except Author.DoesNotExist:
             return json_response({"error": "No Author matches the given query"}, 404)
-        self.data = request.body and dict(json.loads(request.body), id=self.author.id)
-        return super(AuthorView, self).dispatch(request, *args, **kwargs)
+
+        try:
+            self.data = request.body and dict(json.loads(request.body), id=self.author.id)
+        except json.JSONDecodeError:
+            return json_response({"error": "Unprocessable JSON"}, 400)
+
+        return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         return json_response(AuthorSchema().dump(self.author))
